@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+
+psycopg2-binary      # PostgreSQL client
+redis                # For Celery broker
+qdrant-client        # Vector DB client
+
+python-dotenv        # For reading .env files (optional but useful)
+
+
+requests
