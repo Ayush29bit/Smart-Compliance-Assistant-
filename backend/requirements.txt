@@ -10,3 +10,5 @@ python-dotenv        # For reading .env files (optional but useful)
 
 
 requests
+sentence-transformers
+numpy
