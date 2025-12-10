@@ -4,11 +4,13 @@ pydantic
 python-multipart
 
 
-qdrant-client        # Vector DB client
+qdrant-client        
 
-python-dotenv        # For reading .env files (optional but useful)
+python-dotenv        
 
 
 requests
 sentence-transformers
 numpy
+
+openai
