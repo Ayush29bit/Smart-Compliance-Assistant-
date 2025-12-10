@@ -3,6 +3,9 @@ from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 import openai
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ---------------------------
 # 1. Load embedding model
