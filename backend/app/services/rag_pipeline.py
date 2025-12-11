@@ -2,7 +2,7 @@ import os
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,7 +16,7 @@ embedder = SentenceTransformer("all-MiniLM-L6-v2")
 # 2. Connect to Qdrant
 # ---------------------------
 qdrant = QdrantClient(
-    url=os.getenv("QDRANT_URL", "http://localhost:6333"),
+    url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY")
 )
 
