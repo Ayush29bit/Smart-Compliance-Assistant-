@@ -4,17 +4,16 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from openai import OpenAI
 from dotenv import load_dotenv
+from app.services.embedder import embedder, get_embedding
+
 
 load_dotenv()
 
-# ---------------------------
-# 1. Load embedding model
-# ---------------------------
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
-# ---------------------------
-# 2. Connect to Qdrant
-# ---------------------------
+##Connecting to Qdrant
+
+
 qdrant = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY")
@@ -111,7 +110,7 @@ def retrieve(query: str):
 # ---------------------------
 # 6. GENERATE FINAL ANSWER (LLM)
 # ---------------------------
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_answer(query, chunks):
     """
