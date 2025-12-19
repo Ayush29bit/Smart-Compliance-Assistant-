@@ -1,81 +1,44 @@
 import os
-from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from qdrant_client.http import models
+from qdrant_client.models import VectorParams, Distance, PointStruct
 from openai import OpenAI
 from dotenv import load_dotenv
-from app.services.embedder import embedder, get_embedding
 
+from app.services.embedder import embed_document, embed_query
 
 load_dotenv()
 
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
+COLLECTION_NAME = "documents"
 
-##Connecting to Qdrant
-
-
+# Qdrant
 qdrant = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY")
 )
 
+# OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-COLLECTION_NAME = "documents"
-
-# Create collection if not exists
 def ensure_collection():
-    collections = qdrant.get_collections().collections
-    existing = [c.name for c in collections]
-    if COLLECTION_NAME not in existing:
+    collections = [c.name for c in qdrant.get_collections().collections]
+    if COLLECTION_NAME not in collections:
         qdrant.create_collection(
             collection_name=COLLECTION_NAME,
-            vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE)
+            vectors_config=VectorParams(
+                size=384,
+                distance=Distance.COSINE
+            )
         )
 
 ensure_collection()
 
+def store_document(text: str):
+    vectors = embed_document(text)
 
-def embed_document(text: str):
-    """
-    Takes plain text, splits into chunks, embeds them.
-    Returns list of dicts = [{"text": "...", "embedding": [...]}, ...]
-    """
-    chunks = []
-
-    # Simple rule-based chunking
-    CHUNK_SIZE = 300
-    words = text.split()
-
-    current = []
-    for word in words:
-        current.append(word)
-        if len(current) >= CHUNK_SIZE:
-            chunk_text = " ".join(current)
-            embedding = embedder.encode(chunk_text).tolist()
-            chunks.append({"text": chunk_text, "embedding": embedding})
-            current = []
-
-    # Last chunk
-    if current:
-        chunk_text = " ".join(current)
-        embedding = embedder.encode(chunk_text).tolist()
-        chunks.append({"text": chunk_text, "embedding": embedding})
-
-    return chunks
-
-
-
-# STORE VECTORS IN QDRANT
-
-def store_vectors(vectors: list):
-    """
-    Takes list like [{"text": "...", "embedding": [...]}, ...]
-    Stores in Qdrant.
-    """
     qdrant.upsert(
         collection_name=COLLECTION_NAME,
         points=[
-            models.PointStruct(
+            PointStruct(
                 id=i,
                 vector=v["embedding"],
                 payload={"text": v["text"]}
@@ -84,65 +47,37 @@ def store_vectors(vectors: list):
         ]
     )
 
+def retrieve_chunks(query: str, limit: int = 5):
+    query_vector = embed_query(query)
 
-
-# RETRIEVE RELEVANT CHUNKS
-
-def retrieve(query: str):
-    """
-    Search Qdrant for relevant chunks.
-    """
-    query_vec = embedder.encode(query).tolist()
-
-    results = qdrant.search(
+    hits = qdrant.search(
         collection_name=COLLECTION_NAME,
-        query_vector=query_vec,
-        limit=5
+        query_vector=query_vector,
+        limit=limit
     )
 
-    chunks = [hit.payload["text"] for hit in results]
-    return chunks
+    return [hit.payload["text"] for hit in hits]
 
-
-
-# GENERATE FINAL ANSWER
-
-openai_api_key = os.getenv("OPENAI_API_KEY")
-
-def generate_answer(query, chunks):
-    """
-    Combines retrieved chunks & query → sends to LLM.
-    """
+def generate_answer(query: str, chunks: list[str]):
     context = "\n\n".join(chunks)
 
-    prompt = f"""
-    You are a helpful assistant answering questions based on the given context.
-
-    CONTEXT:
-    {context}
-
-    QUESTION:
-    {query}
-
-    Answer based ONLY on the context above.
-    """
-
-    response = OpenAI.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[
+            {
+                "role": "system",
+                "content": "Answer strictly using the provided context."
+            },
+            {
+                "role": "user",
+                "content": f"Context:\n{context}\n\nQuestion:\n{query}"
+            }
+        ]
     )
 
-    return response["choices"][0]["message"]["content"]
-
-
-
- # MAIN RAG PIPELINE
+    return response.choices[0].message.content
 
 def run_rag(query: str):
-    """
-    Full RAG: retrieve → LLM answer
-    """
-    chunks = retrieve(query)
-    answer = generate_answer(query, chunks)
-    return answer
+    chunks = retrieve_chunks(query)
+    return generate_answer(query, chunks)
 
