@@ -35,9 +35,6 @@ def ensure_collection():
 ensure_collection()
 
 
-# ---------------------------
-# 3. EMBEDDING FUNCTION
-# ---------------------------
 def embed_document(text: str):
     """
     Takes plain text, splits into chunks, embeds them.
@@ -67,9 +64,9 @@ def embed_document(text: str):
     return chunks
 
 
-# ---------------------------
-# 4. STORE VECTORS IN QDRANT
-# ---------------------------
+
+# STORE VECTORS IN QDRANT
+
 def store_vectors(vectors: list):
     """
     Takes list like [{"text": "...", "embedding": [...]}, ...]
@@ -88,9 +85,9 @@ def store_vectors(vectors: list):
     )
 
 
-# ---------------------------
-# 5. RETRIEVE RELEVANT CHUNKS
-# ---------------------------
+
+# RETRIEVE RELEVANT CHUNKS
+
 def retrieve(query: str):
     """
     Search Qdrant for relevant chunks.
@@ -107,9 +104,9 @@ def retrieve(query: str):
     return chunks
 
 
-# ---------------------------
-# 6. GENERATE FINAL ANSWER (LLM)
-# ---------------------------
+
+# GENERATE FINAL ANSWER
+
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_answer(query, chunks):
@@ -130,7 +127,7 @@ def generate_answer(query, chunks):
     Answer based ONLY on the context above.
     """
 
-    response = openai.ChatCompletion.create(
+    response = OpenAI.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
@@ -138,9 +135,9 @@ def generate_answer(query, chunks):
     return response["choices"][0]["message"]["content"]
 
 
-# ---------------------------
-# 7. MAIN RAG PIPELINE
-# ---------------------------
+
+ # MAIN RAG PIPELINE
+
 def run_rag(query: str):
     """
     Full RAG: retrieve → LLM answer
