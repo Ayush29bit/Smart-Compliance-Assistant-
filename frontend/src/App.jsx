@@ -4,7 +4,7 @@ import QueryBox from "./components/QueryBox";
 import AnswerBox from "./components/AnswerBox";
 import "./App.css";
 
-function App() {
+export default function App() {
   const [answer, setAnswer] = useState("");
 
   return (
@@ -12,10 +12,10 @@ function App() {
       <h1>Smart Compliance Assistant</h1>
 
       <UploadBox />
+
       <QueryBox setAnswer={setAnswer} />
+
       <AnswerBox answer={answer} />
     </div>
   );
 }
-
-export default App;
