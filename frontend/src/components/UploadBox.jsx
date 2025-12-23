@@ -9,24 +9,29 @@ export default function UploadBox() {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", file);  // Make sure the key is "file"
 
     setStatus("Uploading...");
 
     try {
+      console.log("Uploading file:", file.name);
+      
       const res = await fetch("http://127.0.0.1:8000/api/upload", {
         method: "POST",
         body: formData,
+        // Don't set Content-Type header - let browser set it with boundary
       });
 
+      console.log("Response status:", res.status);
+      
       if (res.ok) {
         const data = await res.json();
         console.log("Upload response:", data);
         setStatus("Document uploaded successfully");
       } else {
-        const errorData = await res.json();
+        const errorData = await res.text();
         console.error("Upload error:", errorData);
-        setStatus("Upload failed: " + (errorData.detail || "Unknown error"));
+        setStatus("Upload failed: " + errorData);
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -96,7 +101,7 @@ export default function UploadBox() {
             ) : (
               <div className="w-5 h-5 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
             )}
-            <p className={`font-medium ${
+            <p className={`font-medium text-sm ${
               status.includes("successfully") 
                 ? "text-green-700" 
                 : status.includes("failed")

@@ -46,17 +46,18 @@ def store_document(text: str):
             for i, v in enumerate(vectors)
         ]
     )
-
+    
 def retrieve_chunks(query: str, limit: int = 5):
     query_vector = embed_query(query)
 
-    hits = qdrant.query_points(
+    # Use the correct method for newer Qdrant versions
+    results = qdrant.query_points(
         collection_name=COLLECTION_NAME,
-        query_vector=query_vector,
+        query=query_vector,  # Changed from query_vector to query
         limit=limit
-    ).points
+    )
 
-    return [hit.payload["text"] for hit in hits]
+    return [point.payload["text"] for point in results.points]
 
 def generate_answer(query: str, chunks: list[str]):
     context = "\n\n".join(chunks)
