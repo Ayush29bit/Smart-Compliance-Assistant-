@@ -13,15 +13,24 @@ export default function UploadBox() {
 
     setStatus("Uploading...");
 
-    const res = await fetch("http://127.0.0.1:8000/api/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (res.ok) {
-      setStatus("Document uploaded successfully");
-    } else {
-      setStatus("Upload failed");
+      if (res.ok) {
+        const data = await res.json();
+        console.log("Upload response:", data);
+        setStatus("Document uploaded successfully");
+      } else {
+        const errorData = await res.json();
+        console.error("Upload error:", errorData);
+        setStatus("Upload failed: " + (errorData.detail || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setStatus("Upload failed: " + error.message);
     }
   };
 
