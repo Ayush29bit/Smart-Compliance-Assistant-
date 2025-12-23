@@ -10,13 +10,13 @@ load_dotenv()
 
 COLLECTION_NAME = "documents"
 
-# Qdrant
+
 qdrant = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY")
 )
 
-# Groq (free and fast!)
+
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def ensure_collection():
@@ -60,7 +60,7 @@ def retrieve_chunks(query: str, limit: int = 5):
 def generate_answer(query: str, chunks: list[str]):
     context = "\n\n".join(chunks)
 
-    # Using Groq instead of OpenAI
+ 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",  # Free and powerful
         messages=[
