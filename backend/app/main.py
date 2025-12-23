@@ -18,8 +18,8 @@ app.add_middleware(
 
 # Include Routers
 app.include_router(health.router, prefix="/api")
-app.include_router(upload.router, prefix="/api")
-app.include_router(rag.router, prefix="/api")
+app.include_router(upload.router, prefix="/api", tags=["upload"])
+app.include_router(rag.router, prefix="/api", tags=["rag"])
 
 @app.get("/")
 def read_root():
