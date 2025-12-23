@@ -50,11 +50,11 @@ def store_document(text: str):
 def retrieve_chunks(query: str, limit: int = 5):
     query_vector = embed_query(query)
 
-    hits = qdrant.search(
+    hits = qdrant.query_points(
         collection_name=COLLECTION_NAME,
         query_vector=query_vector,
         limit=limit
-    )
+    ).points
 
     return [hit.payload["text"] for hit in hits]
 
