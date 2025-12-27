@@ -9,7 +9,7 @@ export default function UploadBox() {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file);  // Make sure the key is "file"
+    formData.append("file", file); 
 
     setStatus("Uploading...");
 
@@ -19,7 +19,7 @@ export default function UploadBox() {
       const res = await fetch("http://127.0.0.1:8000/api/upload", {
         method: "POST",
         body: formData,
-        // Don't set Content-Type header - let browser set it with boundary
+        
       });
 
       console.log("Response status:", res.status);
@@ -56,7 +56,7 @@ export default function UploadBox() {
             onChange={(e) => setFile(e.target.files[0])}
             className="hidden"
             id="file-upload"
-            accept=".pdf,.doc,.docx,.txt"
+            accept=".pdf,.doc,.docx,.txt, .jpg, .png, .md"
           />
           <label
             htmlFor="file-upload"
@@ -67,7 +67,7 @@ export default function UploadBox() {
               {file ? file.name : 'Click to select a file'}
             </p>
             <p className="text-sm text-slate-500 mt-2">
-              PDF, DOC, DOCX, TXT supported
+              PDF, Word, PowerPoint, Images, HTML, Markdown supported
             </p>
           </label>
         </div>
