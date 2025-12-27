@@ -18,9 +18,9 @@ Ground all answers strictly in the uploaded document
 This project demonstrates real-world applied AI: combining OCR, vector databases, embeddings, and LLMs inside a modular backend architecture.
 
 🧠 Features
-✅ OCR Text Extraction
+✅ Text Extraction
 
-Uses EasyOCR / PDF utilities to convert both image-based and text-based PDFs into clean text.
+Uses Docling for transforming complex, unstructured documents (PDFs, Word, PPTs, images)
 
 ✅ Chunking & Embedding
 
