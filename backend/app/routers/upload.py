@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 import os
-from app.services.ocr import extract_text
+from app.services.docling_service import extract_text
 from app.services.embedder import embed_document, store_vectors
 
 router = APIRouter()

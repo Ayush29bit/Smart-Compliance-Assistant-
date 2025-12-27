@@ -1,6 +1,6 @@
 from docling.document_converter import DocumentConverter
 
-def extract_text_with_docling(file_path: str) -> str:
+def extract_text(file_path: str) -> str:
     """
     Extract text from any document using Docling.
     """
