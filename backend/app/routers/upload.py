@@ -29,10 +29,13 @@ async def upload_file(file: UploadFile = File(...)):
         
         print(f"File saved to: {file_path}")
 
-        # 2. Extract text via OCR
+        # 2. Extract text with Docling
         extracted_text = extract_text(file_path)
         print(f"Extracted text length: {len(extracted_text)}")
-
+        
+        if not extracted_text.strip():
+            raise HTTPException(status_code=400, detail="No text could be extracted from the document")
+        
         # 3. Chunk + embed
         vectors = embed_document(extracted_text)
         print(f"Generated {len(vectors)} vectors")
