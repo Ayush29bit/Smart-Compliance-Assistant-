@@ -13,9 +13,12 @@ requests
 sentence-transformers
 numpy
 
-openai
 
-easyocr
+
 pdf2image
 pillow
 pymupdf
+
+
+## For document parsing we have used docling
+docling
